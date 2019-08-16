@@ -13,7 +13,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "SwiftPM",
+    name: "SPMArgumentParser",
     products: [
         // Collection of general purpose utilities.
         //
@@ -23,10 +23,7 @@ let package = Package(
         .library(
             name: "SPMArgumentParser",
             targets: [
-                "clibc",
-                "SPMLibc",
-                "Basic",
-                "SPMUtility",
+                "SPMArgumentParser",
             ]
         ),
     ],
@@ -46,7 +43,7 @@ let package = Package(
             dependencies: ["SPMLibc"]),
         .target(
             /** Abstractions for common operations, should migrate to Basic */
-            name: "SPMUtility",
+            name: "SPMArgumentParser",
             dependencies: ["Basic"]),
     ]
 )
