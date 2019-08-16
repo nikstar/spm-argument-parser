@@ -13,73 +13,22 @@
 import PackageDescription
 
 let package = Package(
-    name: "SwiftPM",
+    name: "SPMArgumentParser",
     products: [
-        // The `libSwiftPM` set of interfaces to programatically work with Swift
-        // packages.
-        //
-        // NOTE: This API is *unstable* and may change at any time.
-        .library(
-            name: "SwiftPM",
-            type: .dynamic,
-            targets: [
-                "clibc",
-                "SPMLibc",
-                "Basic",
-                "SPMUtility",
-                "SourceControl",
-                "SPMLLBuild",
-                "PackageModel",
-                "PackageLoading",
-                "PackageGraph",
-                "Build",
-                "Xcodeproj",
-                "Workspace"
-            ]
-        ),
-        .library(
-            name: "SwiftPM-auto",
-            targets: [
-                "clibc",
-                "SPMLibc",
-                "Basic",
-                "SPMUtility",
-                "SourceControl",
-                "SPMLLBuild",
-                "PackageModel",
-                "PackageLoading",
-                "PackageGraph",
-                "Build",
-                "Xcodeproj",
-                "Workspace"
-            ]
-        ),
-
         // Collection of general purpose utilities.
         //
         // NOTE: This product consists of *unsupported*, *unstable* API. These
         // APIs are implementation details of the package manager. Depend on it
         // at your own risk.
         .library(
-            name: "SPMUtility",
+            name: "SPMArgumentParser",
             targets: [
-                "clibc",
-                "SPMLibc",
-                "Basic",
-                "SPMUtility",
+                "SPMArgumentParser",
             ]
         ),
     ],
     targets: [
-        // The `PackageDescription` targets are special, they define the API which
-        // is available to the `Package.swift` manifest files.
-        .target(
-            /** Package Definition API version 4 */
-            name: "PackageDescription4",
-            dependencies: []),
-
         // MARK: Support libraries
-
         .target(
             /** Shim target to import missing C headers in Darwin and Glibc modulemap. */
             name: "clibc",
@@ -94,177 +43,7 @@ let package = Package(
             dependencies: ["SPMLibc"]),
         .target(
             /** Abstractions for common operations, should migrate to Basic */
-            name: "SPMUtility",
+            name: "SPMArgumentParser",
             dependencies: ["Basic"]),
-        .target(
-            /** Source control operations */
-            name: "SourceControl",
-            dependencies: ["Basic", "SPMUtility"]),
-        .target(
-            /** Shim for llbuild library */
-            name: "SPMLLBuild",
-            dependencies: ["Basic", "SPMUtility"]),
-
-        // MARK: Project Model
-
-        .target(
-            /** Primitive Package model objects */
-            name: "PackageModel",
-            dependencies: ["Basic", "SPMUtility"]),
-        .target(
-            /** Package model conventions and loading support */
-            name: "PackageLoading",
-            dependencies: ["Basic", "PackageModel", "SPMUtility", "SPMLLBuild"]),
-
-        // MARK: Package Dependency Resolution
-
-        .target(
-            /** Data structures and support for complete package graphs */
-            name: "PackageGraph",
-            dependencies: ["Basic", "PackageLoading", "PackageModel", "SourceControl", "SPMUtility"]),
-
-        // MARK: Package Manager Functionality
-
-        .target(
-            /** Builds Modules and Products */
-            name: "Build",
-            dependencies: ["Basic", "PackageGraph"]),
-        .target(
-            /** Generates Xcode projects */
-            name: "Xcodeproj",
-            dependencies: ["Basic", "PackageGraph"]),
-        .target(
-            /** High level functionality */
-            name: "Workspace",
-            dependencies: ["Basic", "Build", "PackageGraph", "PackageModel", "SourceControl", "Xcodeproj"]),
-
-        // MARK: Commands
-
-        .target(
-            /** High-level commands */
-            name: "Commands",
-            dependencies: ["Basic", "Build", "PackageGraph", "SourceControl", "SPMUtility", "Xcodeproj", "Workspace"]),
-        .target(
-            /** The main executable provided by SwiftPM */
-            name: "swift-package",
-            dependencies: ["Commands"]),
-        .target(
-            /** Builds packages */
-            name: "swift-build",
-            dependencies: ["Commands"]),
-        .target(
-            /** Runs package tests */
-            name: "swift-test",
-            dependencies: ["Commands"]),
-        .target(
-            /** Runs an executable product */
-            name: "swift-run",
-            dependencies: ["Commands"]),
-        .target(
-            /** Shim tool to find test names on OS X */
-            name: "swiftpm-xctest-helper",
-            dependencies: []),
-
-        // MARK: Additional Test Dependencies
-
-        .target(
-            /** Test support library */
-            name: "TestSupport",
-            dependencies: ["Basic", "PackageGraph", "PackageLoading", "SourceControl", "SPMUtility", "Commands"]),
-        .target(
-            /** Test support executable */
-            name: "TestSupportExecutable",
-            dependencies: ["Basic", "SPMUtility"]),
-
-        .testTarget(
-            name: "BasicTests",
-            dependencies: ["TestSupport", "TestSupportExecutable"]),
-        .testTarget(
-            name: "BasicPerformanceTests",
-            dependencies: ["Basic", "TestSupport"]),
-        .testTarget(
-            name: "BuildTests",
-            dependencies: ["Build", "TestSupport"]),
-        .testTarget(
-            name: "CommandsTests",
-            dependencies: ["swift-build", "swift-package", "swift-test", "swift-run", "Commands", "Workspace", "TestSupport"]),
-        .testTarget(
-            name: "WorkspaceTests",
-            dependencies: ["Workspace", "TestSupport"]),
-        .testTarget(
-            name: "FunctionalTests",
-            dependencies: ["swift-build", "swift-package", "swift-test", "Basic", "SPMUtility", "PackageModel", "TestSupport"]),
-        .testTarget(
-            name: "FunctionalPerformanceTests",
-            dependencies: ["swift-build", "swift-package", "swift-test", "TestSupport"]),
-        .testTarget(
-            name: "PackageDescription4Tests",
-            dependencies: ["PackageDescription4"]),
-        .testTarget(
-            name: "PackageLoadingTests",
-            dependencies: ["PackageLoading", "TestSupport"],
-            exclude: ["Inputs"]),
-        .testTarget(
-            name: "PackageLoadingPerformanceTests",
-            dependencies: ["PackageLoading", "TestSupport"]),
-        .testTarget(
-            name: "PackageModelTests",
-            dependencies: ["PackageModel"]),
-        .testTarget(
-            name: "PackageGraphTests",
-            dependencies: ["PackageGraph", "TestSupport"]),
-        .testTarget(
-            name: "PackageGraphPerformanceTests",
-            dependencies: ["PackageGraph", "TestSupport"]),
-        .testTarget(
-            name: "SourceControlTests",
-            dependencies: ["SourceControl", "TestSupport"]),
-        .testTarget(
-            name: "TestSupportTests",
-            dependencies: ["TestSupport"]),
-        .testTarget(
-            name: "UtilityTests",
-            dependencies: ["SPMUtility", "TestSupport", "TestSupportExecutable"]),
-        .testTarget(
-            name: "XcodeprojTests",
-            dependencies: ["Xcodeproj", "TestSupport"]),
-    ],
-    swiftLanguageVersions: [.v4_2]
+    ]
 )
-
-// Add package dependency on llbuild when not bootstrapping.
-//
-// When bootstrapping SwiftPM, we can't use llbuild as a package dependency it
-// will provided by whatever build system (SwiftCI, bootstrap script) is driving
-// the build process. So, we only add these dependencies if SwiftPM is being
-// built directly using SwiftPM. It is a bit unfortunate that we've add the
-// package dependency like this but there is no other good way of expressing
-// this right now.
-
-import class Foundation.ProcessInfo
-
-if ProcessInfo.processInfo.environment["SWIFTPM_BOOTSTRAP"] == nil {
-    if ProcessInfo.processInfo.environment["SWIFTCI_USE_LOCAL_DEPS"] == nil {
-        package.dependencies += [
-            .package(url: "https://github.com/apple/swift-llbuild.git", .branch("master")),
-        ]
-    } else {
-        // In Swift CI, use a local path to llbuild to interoperate with tools
-        // like `update-checkout`, which control the sources externally.
-        package.dependencies += [
-            .package(path: "../llbuild"),
-        ]
-    }
-    package.targets.first(where: { $0.name == "SPMLLBuild" })!.dependencies += ["llbuildSwift"]
-}
-
-if ProcessInfo.processInfo.environment["SWIFTPM_BUILD_PACKAGE_EDITOR"] != nil {
-    package.targets += [
-        .target(name: "SPMPackageEditor", dependencies: ["Workspace", "SwiftSyntax"]),
-        .target(name: "swiftpm-manifest-tool", dependencies: ["SPMPackageEditor"]),
-        .testTarget(name: "SPMPackageEditorTests", dependencies: ["SPMPackageEditor", "TestSupport"]),
-    ]
-    package.dependencies += [
-        .package(path: "../swift-syntax"),
-    ]
-}
